@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-const Filters = () => {
+const Filters = ({ filterCharacters, setPage, resetFetchCharacters }) => {
   const [movies, setMovies] = useState([]);
   const [species, setSpecies] = useState([]);
   const [searchSpecies, setSearchSpecies] = useState([]);
   const [searchMovies, setSearchMovies] = useState([]);
   const [speciesPage, setSpeciesPage] = useState('');
+  const moviesRef = useRef([]);
+  const speciesRef = useRef([]);
   useEffect(() => {
     const fetchMovies = async () => {
       const moviesResponse = await fetch('https://swapi.dev/api/films');
@@ -27,7 +29,7 @@ const Filters = () => {
         return { name: specie.name, url: specie.url };
       });
 
-      console.log('Species Data: ', y);
+      // console.log('Species Data: ', y);
       setSpecies(y);
     };
     fetchMovies();
@@ -46,9 +48,7 @@ const Filters = () => {
     }
   };
 
-  const handleMovies = (e) => {
-    // console.log('Species checked: ', e.target.checked);
-    // console.log('Species: ', e.target.value);
+  const handleMovies = (e = null) => {
     const movieExists = searchMovies.find((x) => x === e.target.value);
     if (!movieExists) {
       setSearchMovies((prev) => [...prev, e.target.value]);
@@ -58,13 +58,10 @@ const Filters = () => {
     }
   };
 
-  //   console.log('Search Species: ', searchSpecies);
-  //   console.log('Search Movies: ', searchMovies);
-
   const handleLoadMoreSpecies = async () => {
     const speciesResponse = await fetch(speciesPage);
     const speciesData = await speciesResponse.json();
-    console.log('Species Data: ', speciesData);
+    // console.log('Species Data: ', speciesData);
     const y = speciesData.results.map((specie) => {
       return { name: specie.name, url: specie.url };
     });
@@ -79,17 +76,42 @@ const Filters = () => {
     }
   };
 
-  console.log('Next Page: ', speciesPage);
+  const handleClearFilters = () => {
+    for (let i = 0; i < moviesRef.current.length; i++) {
+      console.log('Movies checkbox: ', moviesRef.current[i].checked);
+
+      moviesRef.current[i].checked = false;
+    }
+
+    console.log('Species checkbox: ', speciesRef.current.checked);
+
+    for (let j = 0; j < speciesRef.current.length; j++) {
+      console.log('Species checkbox: ', speciesRef.current[j].checked);
+      speciesRef.current[j].checked = false;
+    }
+
+    setSearchMovies([]);
+    setSearchSpecies([]);
+    filterCharacters([], []);
+
+    // handleMovies();
+    setPage(1);
+    resetFetchCharacters();
+  };
+
+  // console.log('Next Page: ', speciesPage);
   return (
     <div>
       <div>
         <h2 className='text-lg font-medium mb-3'>Movies</h2>
         <ul>
-          {movies?.map((movie) => {
+          {movies?.map((movie, index) => {
             return (
               <li key={movie.url} className='flex items-center gap-3'>
                 <input
-                  //   onClick={(e) => console.log(e.target.value)}
+                  ref={(element) => {
+                    moviesRef.current[index] = element;
+                  }}
                   onChange={(e) => handleMovies(e)}
                   type='checkbox'
                   value={movie.url}
@@ -106,11 +128,13 @@ const Filters = () => {
       <div>
         <h2 className='text-lg font-medium mb-3'>Species</h2>
         <ul>
-          {species?.map((specie) => {
+          {species?.map((specie, index) => {
             return (
               <li key={specie.url} className='flex items-center gap-3'>
                 <input
-                  //   onClick={(e) => console.log(e.target.value)}
+                  ref={(element) => {
+                    speciesRef.current[index] = element;
+                  }}
                   onChange={(e) => handleSpecies(e)}
                   type='checkbox'
                   value={specie.url}
@@ -123,17 +147,26 @@ const Filters = () => {
           })}
         </ul>
         <button
-          className='text-medium font-medium mt-2'
+          className={`${
+            speciesPage === null && 'text-gray-400 cursor-not-allowed'
+          }  text-medium font-medium mt-2`}
           onClick={() => handleLoadMoreSpecies()}>
           More
         </button>
       </div>
-
-      <button
-        disabled={speciesPage === null}
-        className='mt-6 ring-1 px-4 py-2 rounded-lg'>
-        Search
-      </button>
+      <div className='flex items-center gap-6'>
+        <button
+          onClick={() => filterCharacters(searchMovies, searchSpecies)}
+          disabled={speciesPage === null}
+          className={`mt-6 ring-1 px-4 py-2 rounded-lg`}>
+          Search
+        </button>
+        <button
+          onClick={() => handleClearFilters()}
+          className={`mt-6 ring-1 px-4 py-2 rounded-lg`}>
+          Clear Filters
+        </button>
+      </div>
     </div>
   );
 };
