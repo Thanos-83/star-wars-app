@@ -102,9 +102,9 @@ const Filters = ({ filterCharacters, setPage, resetFetchCharacters }) => {
   // console.log('Next Page: ', speciesPage);
   return (
     <div>
-      <div>
+      <div className='mb-4'>
         <h2 className='text-lg font-medium mb-3'>Movies</h2>
-        <ul>
+        <ul className='space-y-2'>
           {movies?.map((movie, index) => {
             return (
               <li key={movie.url} className='flex items-center gap-3'>
@@ -127,7 +127,7 @@ const Filters = ({ filterCharacters, setPage, resetFetchCharacters }) => {
 
       <div>
         <h2 className='text-lg font-medium mb-3'>Species</h2>
-        <ul>
+        <ul className='space-y-2'>
           {species?.map((specie, index) => {
             return (
               <li key={specie.url} className='flex items-center gap-3'>
@@ -149,7 +149,7 @@ const Filters = ({ filterCharacters, setPage, resetFetchCharacters }) => {
         <button
           className={`${
             speciesPage === null && 'text-gray-400 cursor-not-allowed'
-          }  text-medium font-medium mt-2`}
+          }  text-medium text-gray-600 font-medium mt-2`}
           onClick={() => handleLoadMoreSpecies()}>
           More
         </button>

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function Header() {
   return (
-    <div className=' py-6 bg-white sticky top-0 shadow'>
+    <div className=' py-6 bg-white sticky top-0 shadow z-50'>
       <header className='container flex items-center justify-between'>
         <Link to='/'>
           <img
@@ -15,13 +15,6 @@ function Header() {
             alt='logo'
           />
         </Link>
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'>
-          Learn React
-        </a>
       </header>
     </div>
   );

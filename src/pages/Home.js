@@ -2,18 +2,26 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AiOutlineLoading } from 'react-icons/ai';
+import { GrFormNextLink } from 'react-icons/gr';
+import { CiFilter } from 'react-icons/ci';
+import { IoCloseSharp } from 'react-icons/io5';
+
 import Filters from '../components/Filters';
 
 const Home = () => {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [nextPage, setNextPage] = useState(' ');
   // console.log('Loading State: ', loading);
+  const [openFilters, setOpenFilters] = useState(false);
 
   useEffect(() => {
     console.log('Iam in useEffect hook...');
     const fetchCharacters = async () => {
       if (page === 1) {
+        setInitialLoading(true);
         const response = await fetch(`https://swapi.dev/api/people/`, {
           cache: 'no-store',
         });
@@ -21,6 +29,8 @@ const Home = () => {
         const chars = await response.json();
 
         setCharacters(chars.results);
+        setNextPage(chars.next);
+        setInitialLoading(false);
       }
       if (page >= 2) {
         setLoading(true);
@@ -34,14 +44,15 @@ const Home = () => {
         //   console.log('Characters: ', chars);
         setCharacters((prev) => [...prev, ...moreChars.results]);
         setLoading(false);
+        setNextPage(moreChars.next);
       }
       return;
     };
 
     fetchCharacters();
   }, [page]);
-  console.log('Characters Data: ', characters);
-  console.log('Current Page...:', page);
+  // console.log('Characters Data: ', characters);
+  // console.log('Current Page...:', page);
 
   const filterCharacters = (movies, species) => {
     // console.log('Movies: ', movies);
@@ -158,9 +169,11 @@ const Home = () => {
         alert('No results matching the selection criteria!!');
       }
     }
+    setOpenFilters(false);
   };
 
   const resetFetchCharacters = async () => {
+    setInitialLoading(true);
     const response = await fetch(`https://swapi.dev/api/people/`, {
       cache: 'no-store',
     });
@@ -168,33 +181,95 @@ const Home = () => {
     const chars = await response.json();
 
     setCharacters(chars.results);
+    setNextPage(chars.next);
+    setInitialLoading(false);
   };
   return (
     <div className='min-h-screen'>
       <main className='container'>
-        <div className='my-16 flex items-start'>
-          <div className='w-2/4'>
-            <h2 className='mb-10 text-xl '>Filters</h2>
+        <div className='my-16 sm:flex  items-start'>
+          <div
+            className={`fixed sm:relative top-0 ${
+              openFilters ? 'left-0' : '-left-full'
+            } p-4 h-screen overflow-y-auto bottom-0 z-[100] w-[90%] bg-white sm:block sm:w-2/4 sm:overflow-x-hidden sm:bg-inherit sm:left-0 max-w-[300px] border-r-2 sm:z-[1] sm:h-auto`}>
+            <div className='mb-6 sm:mb-0 flex items-center justify-between'>
+              <h2 className='sm:mb-10 text-xl font-semibold pb-1 border-b-2 inline-block'>
+                Filters
+              </h2>
+              <button>
+                <IoCloseSharp
+                  className='sm:hidden h-6 w-6'
+                  onClick={() => setOpenFilters(false)}
+                />
+              </button>
+            </div>
             <Filters
               filterCharacters={filterCharacters}
               setPage={setPage}
               resetFetchCharacters={resetFetchCharacters}
             />
           </div>
-          <div className='w-2/4'>
-            <ul>
-              {characters?.length > 0 &&
+          <button
+            onClick={() => setOpenFilters(true)}
+            className='fixed top-[6rem] right-[2rem] z-[99] sm:hidden rounded-md bg-slate-200 py-1 px-3 mb-4 flex items-center gap-2 text-lg font-sans font-semibold'>
+            <CiFilter className='w-6 h-6' />
+            <span>Filters</span>
+          </button>
+          <div className='pl-2 sm:pl-12 sm:w-2/4'>
+            <ul className='space-y-4'>
+              {initialLoading ? (
+                <div className='space-y-6 max-w-[300px]'>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                  <div className='animate-pulse'>
+                    <div class='h-3 bg-slate-200 rounded'></div>
+                  </div>
+                </div>
+              ) : (
+                characters?.length > 0 &&
                 characters?.map((character) => (
-                  <li key={character.name}>
-                    <Link to={`/characters/${character?.url.split('/')[5]}`}>
+                  <li className='group' key={character.name}>
+                    <Link
+                      className='flex items-center text-lg'
+                      to={`/characters/${character?.url.split('/')[5]}`}>
                       {character.name}
+                      <GrFormNextLink className='group-hover:translate-x-2 transition-all w-4 h-4 ml-1' />
                     </Link>
                   </li>
-                ))}
+                ))
+              )}
             </ul>
             <div className='space-x-4 mt-4 '>
               <button
-                className={`py-[0.75rem] text-center w-[140px] rounded-lg  px-6 font-[600] ring ring-[#F3BC01] ${
+                disabled={!nextPage}
+                className={`${
+                  !nextPage && 'bg-slate-500 text-gray-300 cursor-not-allowed'
+                } py-[0.75rem] text-center w-[180px] rounded-lg  px-6 font-[600] ring ring-[#F3BC01] ${
                   loading &&
                   'pointer-events-none cursor-not-allowed	 bg-slate-200'
                 }`}
@@ -202,7 +277,7 @@ const Home = () => {
                 {loading ? (
                   <AiOutlineLoading className='mx-auto h-4 w-4 animate-spin' />
                 ) : (
-                  <span>Load More</span>
+                  <span>{nextPage ? 'Load More' : 'No More Data'}</span>
                 )}
               </button>
             </div>

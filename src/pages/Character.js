@@ -6,7 +6,7 @@ const Character = () => {
   const [characterMovies, setCharacterMovies] = useState([]);
   const [characterSpaceships, setCharacterSpaceships] = useState([]);
   const [characterSpecies, setCharacterSpecies] = useState([]);
-  const [loadingMovies, setLoadingMovies] = useState(false);
+  // const [loadingMovies, setLoadingMovies] = useState(false);
   const [characterInfo, setCharacterInfo] = useState(null);
 
   useEffect(() => {
@@ -25,8 +25,7 @@ const Character = () => {
           character?.films?.map(async (film) => {
             const filmResponse = await fetch(film);
             const filmData = await filmResponse.json();
-            // console.log('Film inside map: ', filmData);
-            //   filmData.name;
+
             return filmData.title;
           })
         );
@@ -40,13 +39,10 @@ const Character = () => {
           character?.starships?.map(async (starship) => {
             const starshipResponse = await fetch(starship);
             const starshipData = await starshipResponse.json();
-            // console.log('Starship inside map: ', starshipData);
-            //   starshipData.name;
             return starshipData.name;
           })
         );
         setCharacterSpaceships([...starships]);
-        // console.log('Starships: ', starships);
       }
 
       if (character?.species.length > 0) {
@@ -56,20 +52,17 @@ const Character = () => {
           character?.species?.map(async (starship) => {
             const speciesResponse = await fetch(starship);
             const speciesData = await speciesResponse.json();
-            // console.log('Species inside map: ', speciesData);
-            //   speciesData.name;
             return speciesData.name;
           })
         );
         setCharacterSpecies([...species]);
-        // console.log('Starships: ', starships);
       }
     };
     fetchCharacter();
   }, [params]);
-  //   console.log('Movies: ', characterMovies);
   return (
     <main className='container my-16 space-y-6'>
+      <h1 className='text-3xl font-serif font-semibold mb-4'>Character Info</h1>
       <div className='flex bg-white gap-4 shadow-[#F3BC01] shadow-md rounded-md p-6'>
         <p className='text-xl font-semibold min-w-[120px]'>Name:</p>
         <p>{characterInfo?.name}</p>
